@@ -40,8 +40,6 @@ public class Jogo {
 
         //Listas
         List<String> nomesJogadores = new ArrayList<>();
-        List<Integer> ordemDeJogada = new ArrayList<>();
-        List<Integer> cartaQueDeveSerJogada = new ArrayList<>();
 
 
         //Matriz
@@ -53,6 +51,7 @@ public class Jogo {
         int ordenamentoDeJogada = 0;
         int xTabela = 0;
         int yTabela = 0;
+        int contadorRodada = 0;
 
 
         //Trata as exeções caso algo inválido seja digitado na hora da seleção da quantidade de jogadores
@@ -103,10 +102,16 @@ public class Jogo {
 
         //Inicio do jogo
         System.out.println("Inicio do Jogo: ");
-        while(true){
+        while(contadorRodada < 12){
+            //Declaração de listas
+            List<Integer> ordemDeJogada = new ArrayList<>();
+            List<Integer> cartaQueDeveSerJogada = new ArrayList<>();
+
+
             //Impressão do tabuleiro
             System.out.println("Tabuleiro: ");
             tabuleiro.ImpressaoTabuleiro();
+            System.out.println(" ");
 
             //Seleção de cartas
             for(int iTres = 0; iTres < numJogadores; iTres++){
@@ -124,13 +129,17 @@ public class Jogo {
                 try {
                     System.out.println("Selicione a carta que você deseja, digitando o número dela.");
                     selecaoDeCartas = scanner.nextInt();
+                    System.out.println(" ");
 
                     if (selecaoDeCartas == 0) {
                         System.out.println("Número inválido. O número deve estar entre 1 e 12.");
+                        System.out.println(" ");
                     }
                 } catch (InputMismatchException e) {
                     System.out.println("Erro: Digite um número válido.");
                     scanner.nextLine(); 
+                    System.out.println(" ");
+
                 }
                 //Salvando cartas selecionadas
                 cartasSelecionadas[iTres][0] = selecaoDeCartas;
@@ -171,7 +180,8 @@ public class Jogo {
             //Imprimir ordem de jogada
             System.out.println("Ordem de jogada: ");
             for(int iOito = 0; iOito < numJogadores; iOito++){
-                jogadores.mostrarJogador(ordemDeJogada.get(iOito));
+                jogadores.mostrarJogador(+ordemDeJogada.get(iOito));
+                System.out.println(" ");
             }
             System.out.println("   ");
 
@@ -184,21 +194,97 @@ public class Jogo {
                 //Selecionando o jogador
                 jogadores.mostrarJogador(ordemDeJogada.get(iNove));
                 System.out.println(" ");
+                System.out.println("Carta a ser jogada: " + cartaQueDeveSerJogada.get(iNove));
+                System.out.println(" ");
 
-                System.out.println("Digite o número da linha da  tabela, para colocar a carta.");
-                xTabela = scanner.nextInt();
 
+                //Tratamento de exceção
+              
+                int validacao = 0;
+                int linhaDesejada = 0;
+                System.out.println("Se deseja capturar uma linha digite 9.");
+                validacao = scanner.nextInt();
+                System.out.println(" ");
+
+                if(validacao == 9){
+                    System.out.println("Digite o número da linha desejada:");
+                    linhaDesejada = scanner.nextInt();
+                    System.out.println(" ");
+
+                    linhaDesejada = linhaDesejada - 1;
+                    for(int i = 0; i <= 4; i++ ){
+                        maoJogadores.adicionarCartaMonte(ordemDeJogada.get(iNove), linhaDesejada, i);
+                        System.out.println("");
+                        tabuleiro.zerarTabuleiro(linhaDesejada, i);
+
+                        }
+                }else{
+                    System.out.println("Digite a linha que você quer colocar a carta");
+                    xTabela = scanner.nextInt();
+                    System.out.println(" ");
+                    xTabela = xTabela -1;
+                    System.out.println("Digite a coluna que você quer colocar a carta");
+                    yTabela = scanner.nextInt();
+                    System.out.println(" ");
+                    yTabela = yTabela - 1;
+                }               
+                
+                if(validacao == 9){
+                    xTabela = linhaDesejada;
+                    yTabela = 0;
+                }
 
                 //Colocando o número na tabela
+                tabuleiro.setTabuleiro(xTabela, yTabela, cartaQueDeveSerJogada.get(iNove));
+
+
+                //Imprimindo tabuleiro
+                tabuleiro.ImpressaoTabuleiro();
+                System.out.println("");
+                System.out.println(" ");
+
                 
 
             }
+
+            //Pontuação
+                for(int i = 0; i < numJogadores; i++){
+                    System.out.print(nomesJogadores.get(i) + ": ");
+                    System.out.println(maoJogadores.pontuacao(i));
+                    System.out.println(" ");
             
+                }
 
             
-
+            contadorRodada++;
         }
-        
 
+        //Pontuação e menor pontuação
+            int menorPontuacao = 100;
+            int indexJogador = 0;
+            System.out.println("Pontuação: ");
+            for(int i = 0; i < numJogadores; i++){
+                System.out.print(nomesJogadores.get(i) + ": ");
+                System.out.println(maoJogadores.pontuacao(i));
+                if(maoJogadores.pontuacao(i) < menorPontuacao){
+                    menorPontuacao = maoJogadores.pontuacao(i);
+                    indexJogador = i;
+                }
+            }
+
+            //Mostrar monte dos jogadores
+            for(int i = 0; i < numJogadores; i++){
+                for(int c = 0; c < 49; c++){
+                    System.out.println(maoJogadores.getMonte(i, c));
+                }
+
+            }
+
+
+            //Fim de jogo
+            System.out.println("Ganhador :" + nomesJogadores.get(indexJogador));
+       
+ 
         }
 }
+
